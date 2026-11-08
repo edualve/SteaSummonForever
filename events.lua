@@ -3,6 +3,9 @@
 local addonName, addonData = ...
 local call = {}
 
+-- API compat: the WoW: Forever client removed this classic-era global
+local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+
 local frame
 
 local function callback(self, event, ...)
@@ -18,7 +21,11 @@ local function playerEnter()
   for k,_ in pairs(call) do
     if k ~= "ADDON_LOADED" then
       db("event.event","registering event", k)
-      frame:RegisterEvent(k)
+      -- pcall: an event name this client no longer knows must not abort the rest
+      local ok = pcall(frame.RegisterEvent, frame, k)
+      if not ok then
+        db("event.event", "event not supported by this client:", k)
+      end
     end
   end
 end

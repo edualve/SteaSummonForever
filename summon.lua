@@ -2,6 +2,15 @@ _,addonData = ...
 local L = LibStub("AceLocale-3.0"):GetLocale("SteaSummonForever")
 local g_self -- for callbacks
 
+-- API compat: the WoW: Forever client removed these classic-era globals
+local GetSpellInfo = GetSpellInfo or function(spellID)
+  local info = C_Spell.GetSpellInfo(spellID)
+  if info then
+    return info.name, nil, info.iconID, info.castTime, info.minRange, info.maxRange, info.spellID
+  end
+end
+local GetItemInfo = GetItemInfo or (C_Item and C_Item.GetItemInfo)
+
 local summon = {
   waiting = {}, -- the summon list
   numwaiting = 0, -- the summon list length
@@ -574,7 +583,7 @@ local summon = {
 
     if not SteaSummonFrame then
 
-      local f = CreateFrame("Frame", "SteaSummonFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate, AnimatedShineTemplate")
+      local f = CreateFrame("Frame", "SteaSummonFrame", UIParent, "BackdropTemplate")
       f:SetPoint("CENTER")
       f:SetSize(300, 250)
       f:SetScale(SteaSummonSave.windowSize)

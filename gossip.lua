@@ -4,6 +4,9 @@
 local addonName, addonData = ...
 local L = LibStub("AceLocale-3.0"):GetLocale("SteaSummonForever")
 
+-- API compat: the WoW: Forever client removed this classic-era global
+local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+
 -- protocol
 -----------
 -- a arrived

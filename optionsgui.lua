@@ -1,5 +1,8 @@
-local _, addonData = ...
+local addonName, addonData = ...
 local L = LibStub("AceLocale-3.0"):GetLocale("SteaSummonForever")
+
+-- API compat: the WoW: Forever client removed this classic-era global
+local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 
 local optionsgui = {
   showID = nil,
@@ -612,7 +615,7 @@ local advanced = {
       type = "description",
       name = function()
         local version, build, date, tocversion = GetBuildInfo()
-        local pat = { ["%%v"] = version, ["%%b"] = build, ["%%d"] = date, ["%%t"] = tocversion, ["%%s"] = GetAddOnMetadata("SteaSummon", "Version") }
+        local pat = { ["%%v"] = version, ["%%b"] = build, ["%%d"] = date, ["%%t"] = tocversion, ["%%s"] = GetAddOnMetadata(addonName, "Version") }
         local s = L["SteaSummon version %s\n\nWoW client\nversion: %v\nbuild: %b\ndate: %d\ntocversion: %t"]
         return tstring(s, pat)
       end

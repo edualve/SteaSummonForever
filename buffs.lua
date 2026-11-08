@@ -1,5 +1,13 @@
 local _, addonData = ...
 
+-- API compat: the WoW: Forever client removed the classic-era UnitBuff global
+local UnitBuff = UnitBuff or function(unit, index)
+  local aura = C_UnitAuras.GetBuffDataByIndex(unit, index)
+  if not aura then return end
+  return aura.name, aura.icon, aura.applications, aura.dispelName, aura.duration,
+         aura.expirationTime, aura.sourceUnit, aura.isStealable, aura.nameplateShowPersonal, aura.spellId
+end
+
 City = {
   16609, --"WarChief's Blessing",
   22888, --"Rallying Cry of the Dragonslayer",

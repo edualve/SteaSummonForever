@@ -58,16 +58,23 @@ function appbutton:menu(button)
                  menuList = {
                    { text = L["Options"], notCheckable = true, func = addonData.optionsgui.show },
                    { text = L["Key Bindings"], notCheckable = true, func = function()
-                     if (not KeyBindingFrame) then
-                       KeyBindingFrame_LoadUI()
+                     if InCombatLockdown() then
+                       return
                      end
-                     if not InCombatLockdown() then
+                     if KeyBindingFrame_LoadUI then -- classic-era clients
+                       if (not KeyBindingFrame) then
+                         KeyBindingFrame_LoadUI()
+                       end
                        KeyBindingFrame:Show()
                        for _,v in pairs(KeyBindingFrame.categoryList.buttons) do
                          if v:GetText() == "AddOns" or v:GetText() == "ADDONS" then
                            v:Click()
                          end
                        end
+                     elseif Settings and Settings.OpenToCategory and Settings.KEYBINDINGS_CATEGORY_ID then
+                       Settings.OpenToCategory(Settings.KEYBINDINGS_CATEGORY_ID)
+                     elseif SettingsPanel then
+                       SettingsPanel:Open()
                      end
                    end },
                    { text = L["Show/Hide Minimap Button"], notCheckable = true, func = appbutton.toggle },
@@ -75,8 +82,23 @@ function appbutton:menu(button)
 
   } )
 
-  local menuFrame = CreateFrame("Frame", "ExampleMenuFrame", UIParent, "UIDropDownMenuTemplate")
-  EasyMenu(menu, menuFrame, "cursor", 0 , 0, "MENU", 2);
+  if EasyMenu then -- classic-era clients
+    local menuFrame = CreateFrame("Frame", "SteaSummonMenuFrame", UIParent, "UIDropDownMenuTemplate")
+    EasyMenu(menu, menuFrame, "cursor", 0 , 0, "MENU", 2);
+  else -- modern menu system (WoW: Forever client)
+    MenuUtil.CreateContextMenu(self, function(_, root)
+      local function build(desc, items)
+        for _, item in ipairs(items) do
+          if item.menuList then
+            build(desc:CreateButton(item.text), item.menuList)
+          else
+            desc:CreateButton(item.text, item.func)
+          end
+        end
+      end
+      build(root, menu)
+    end)
+  end
 end
 
 local ldb = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {

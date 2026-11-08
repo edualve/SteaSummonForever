@@ -44,7 +44,7 @@ local debug = {
       end
     end
 
-    local f = CreateFrame("Frame", "DBFrame", UIParent, BackdropTemplateMixin and "BackdropTemplate, AnimatedShineTemplate")
+    local f = CreateFrame("Frame", "DBFrame", UIParent, "BackdropTemplate")
     f:SetPoint("CENTER")
     f:SetSize(300, 250)
 
@@ -111,7 +111,7 @@ local debug = {
     sf:SetPoint("TOP", 0, -16)
     sf:SetPoint("BOTTOM", rb, "TOP", 0, 0)
 
-    local dbl = CreateFrame("Frame", "DBLog", DBFrame, "AnimatedShineTemplate")
+    local dbl = CreateFrame("Frame", "DBLog", DBFrame, "BackdropTemplate")
     dbl:SetWidth(DBFrame:GetWidth())
     dbl:SetHeight(DBFrame:GetHeight())
     sf:SetScrollChild(dbl)
@@ -125,7 +125,7 @@ local debug = {
     dbl:SetBackdropBorderColor(0, .44, .87, 0.5) -- darkblue
 
     -- add lines of log
-    local cat = CreateFrame("Frame", "CategoryLinesFrame", DBLog, "AnimatedShineTemplate")
+    local cat = CreateFrame("Frame", "CategoryLinesFrame", DBLog, "BackdropTemplate")
     local x,y = dbl:GetSize()
     local cx = x * 0.2
     db(addonData.debug.loglevel, cx)
@@ -139,7 +139,7 @@ local debug = {
     })
     cat:SetBackdropBorderColor(0, .44, .87, 0.5) -- darkblue
 
-    local line = CreateFrame("Frame", "LogLinesFrame", DBLog, "AnimatedShineTemplate")
+    local line = CreateFrame("Frame", "LogLinesFrame", DBLog, "BackdropTemplate")
     local lx = x * 0.6
     line:SetSize(lx, y)
     line:SetPoint("TOPRIGHT", CategoryLinesFrame, "TOPRIGHT", 0, 0)

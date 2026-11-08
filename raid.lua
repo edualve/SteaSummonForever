@@ -80,6 +80,9 @@ local raid = {
         name = UnitName(unit)
         rank = (UnitIsGroupLeader(unit) and 2) or 0
       end
+      if SteaDEBUG and SteaDEBUG.diag then -- record raw roster name formats
+        SteaDEBUG.diag.roster[i] = name
+      end
       -- normalize Name-Realm to Name so comparisons with UnitName match
       name = addonData.util:shortName(name)
       if name ~= nil then

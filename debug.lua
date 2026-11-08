@@ -77,6 +77,15 @@ local debug = {
       SteaDEBUG.loglength = 3000
     end
 
+    -- diagnostic snapshot of name formats (Forever uses first/last names)
+    SteaDEBUG.diag = {
+      unitName = { UnitName("player") },
+      unitFullName = { UnitFullName("player") },
+      realmName = GetRealmName(),
+      roster = {},
+      authors = {},
+    }
+
     -- start this session's error list fresh (the previous session's errors
     -- were already written to disk when it ended), then flush any errors
     -- trapped before saved variables were available

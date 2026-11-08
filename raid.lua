@@ -71,8 +71,17 @@ local raid = {
       return
     end
 
-    for i = 1, GetNumGroupMembers() do
+    local count = GetNumGroupMembers()
+    for i = 1, count do
       local name, rank = GetRaidRosterInfo(i)
+      if name == nil and not IsInRaid() then
+        -- party fallback for clients where GetRaidRosterInfo is raid-only
+        local unit = (i == count) and "player" or ("party" .. i)
+        name = UnitName(unit)
+        rank = (UnitIsGroupLeader(unit) and 2) or 0
+      end
+      -- normalize Name-Realm to Name so comparisons with UnitName match
+      name = addonData.util:shortName(name)
       if name ~= nil then
         self.roster[name] = 1
 

@@ -141,6 +141,19 @@ local util = {
     return inTable
   end,
 
+  -- modern clients often report group members as Name-Realm even on the
+  -- home realm (Forever is realm-less); strip the suffix unless the player
+  -- is from a genuinely foreign realm, so names compare with UnitName
+  shortName = function(_, name)
+    if not name then return name end
+    local n, realm = strsplit("-", name)
+    local _, myrealm = UnitFullName("player")
+    if realm == nil or realm == "" or realm == myrealm then
+      return n
+    end
+    return name
+  end,
+
   -- API compat: on the WoW: Forever client some unit APIs (UnitInRange,
   -- UnitIsVisible, UnitPosition) can return secret values that addon code
   -- may not branch on; evaluating inside pcall turns that into a nil result

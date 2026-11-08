@@ -22,7 +22,7 @@ local raid = {
     addonData.debug:registerCategory("raid.event")
     buffs = addonData.buffs
     util = addonData.util
-    self.me = UnitName("player")
+    self.me = addonData.util:playerFullName()
   end,
 
   callback = function(self, event, ...)
@@ -109,7 +109,7 @@ local raid = {
         db("raid", k, " left the raid.")
         addonData.summon:remove(k)
 
-        local name, _ = UnitName("player")
+        local name = addonData.util:playerFullName()
         if k == name then
           addonData.gossip:raidLeft()
           addonData.summon:listClear()

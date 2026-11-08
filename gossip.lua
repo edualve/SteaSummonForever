@@ -67,7 +67,7 @@ local gossip = {
     -- register addon comms channel
     self:RegisterComm(self.channel, "callback")
     -- RegisterComm never returns anything, not good imo
-    self.me, _ = UnitName("player")
+    self.me = addonData.util:playerFullName()
     self.votes = UnitGUID("player")
     self.version = GetAddOnMetadata(addonName, "x-SteaSummon-Protocol-version")
     self.SSversion = tonumber(GetAddOnMetadata(addonName, "Version"))

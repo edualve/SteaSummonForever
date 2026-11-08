@@ -14,7 +14,7 @@ local alt = {
 
   init = function(self)
     addonData.debug:registerCategory("alt")
-    self.me, _ = UnitName("player")
+    self.me = addonData.util:playerFullName()
     summon = addonData.summon
     util = addonData.util
     chat = addonData.chat

@@ -94,7 +94,7 @@ local summon = {
     addonData.debug:registerCategory("summon.spellcast")
 
     self.isWarlock = addonData.util:playerIsWarlock()
-    self.me, _ = UnitName("player")
+    self.me = addonData.util:playerFullName()
     self.me = strsplit("-", self.me)
 
     self.waiting = SteaSummonSave.waiting

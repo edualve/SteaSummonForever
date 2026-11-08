@@ -14,7 +14,7 @@ local chat = {
   end,
 
   callback = function (_, event, msg, servername, ...)
-    local me, _ = UnitName("player")
+    local me = addonData.util:playerFullName()
 
     if SteaDEBUG and SteaDEBUG.diag then -- record raw chat author formats
       SteaDEBUG.diag.authors[event] = servername

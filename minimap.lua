@@ -16,7 +16,7 @@ function appbutton:menu(button)
         return
     end
         
-  local me = UnitName("player")
+  local me = addonData.util:playerFullName()
 
   local menu = {
     { text = L["Show/Hide Summon Window"], notCheckable = true,
@@ -86,7 +86,10 @@ function appbutton:menu(button)
     local menuFrame = CreateFrame("Frame", "SteaSummonMenuFrame", UIParent, "UIDropDownMenuTemplate")
     EasyMenu(menu, menuFrame, "cursor", 0 , 0, "MENU", 2);
   else -- modern menu system (WoW: Forever client)
-    MenuUtil.CreateContextMenu(self, function(_, root)
+    -- the owner must be a real frame: self is the LDB button when clicked
+    -- from the minimap, but a plain table when called as appbutton:menu()
+    local owner = (type(self) == "table" and self.GetObjectType) and self or UIParent
+    MenuUtil.CreateContextMenu(owner, function(_, root)
       local function build(desc, items)
         for _, item in ipairs(items) do
           if item.menuList then

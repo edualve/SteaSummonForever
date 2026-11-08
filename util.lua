@@ -141,6 +141,18 @@ local util = {
     return inTable
   end,
 
+  -- WoW: Forever characters have first and last names: UnitName("player")
+  -- returns them as two values ("Summ", "Bert") while rosters and chat
+  -- authors use the full "Summ Bert". Identity comparisons must use the
+  -- full name. On classic clients the second value is nil (realm slot).
+  playerFullName = function(_)
+    local first, second = UnitName("player")
+    if second and second ~= "" then
+      return first .. " " .. second
+    end
+    return first
+  end,
+
   -- modern clients often report group members as Name-Realm even on the
   -- home realm (Forever is realm-less); strip the suffix unless the player
   -- is from a genuinely foreign realm, so names compare with UnitName
@@ -175,7 +187,7 @@ local util = {
   end,
 
   playerClose = function(self, player)
-    local me, _ = UnitName("player")
+    local me = self:playerFullName()
     player = strsplit("-", player) -- might turn up as player-server
 
     if me == player or player == "player" then

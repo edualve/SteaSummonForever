@@ -4,6 +4,11 @@ local _, addonData = ...
 local buffs
 local util
 
+-- API compat: the WoW: Forever client moved these classic-era globals
+local InviteUnit = InviteUnit or (C_PartyInfo and C_PartyInfo.InviteUnit)
+local AcceptGroup = AcceptGroup or (C_PartyInfo and C_PartyInfo.AcceptInvite)
+local ConvertToRaid = ConvertToRaid or (C_PartyInfo and C_PartyInfo.ConvertToRaid)
+
 -- SetLootMethod("method" [,"masterPlayer" or threshold])
 
 local raid = {
@@ -130,8 +135,8 @@ local raid = {
       if v == trigger then
         return true
       end
-      return false
     end
+    return false
   end,
 
   inGuild = function(_, player)

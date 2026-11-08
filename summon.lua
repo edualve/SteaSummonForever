@@ -11,6 +11,14 @@ local GetSpellInfo = GetSpellInfo or function(spellID)
 end
 local GetItemInfo = GetItemInfo or (C_Item and C_Item.GetItemInfo)
 
+-- API compat: create a frame, falling back to another (or no) template when the
+-- client no longer ships the classic-era one
+local function CreateFrameCompat(frameType, name, parent, template, fallbackTemplate)
+  local ok, frame = pcall(CreateFrame, frameType, name, parent, template)
+  if ok then return frame end
+  return CreateFrame(frameType, name, parent, fallbackTemplate)
+end
+
 local summon = {
   waiting = {}, -- the summon list
   numwaiting = 0, -- the summon list length
@@ -683,7 +691,6 @@ local summon = {
         self:createButton(i)
       end
 
-      print("Creating Buttons and setting Text")
       --- Setup Next button
       addonData.buttons[38].Button:SetPoint("TOPLEFT","SteaSummonFrame","TOPLEFT", -10, 10)
       addonData.buttons[38].Button:SetText(L["Next"])
@@ -741,7 +748,7 @@ local summon = {
         end
 
         --- summon to button
-        local place = CreateFrame("Button", "SteaSummonToButton", SteaSummonFrame, "TruncatedButtonTemplate")
+        local place = CreateFrameCompat("Button", "SteaSummonToButton", SteaSummonFrame, "TruncatedButtonTemplate")
         place:SetNormalTexture("Interface\\Buttons\\UI-GuildButton-MOTD-Disabled")
         place:SetHighlightTexture("Interface\\Buttons\\UI-GuildButton-MOTD-Disabled")
         place:SetPushedTexture("Interface\\Buttons\\UI-GuildButton-MOTD-Disabled")
@@ -824,7 +831,7 @@ local summon = {
         addonData.raid:relinquish()
       end
 
-      local lead = CreateFrame("Button", "SteaSummonRelinquishRaidLeadButton", SteaSummonFrame, "TruncatedButtonTemplate")
+      local lead = CreateFrameCompat("Button", "SteaSummonRelinquishRaidLeadButton", SteaSummonFrame, "TruncatedButtonTemplate")
       lead:SetNormalTexture("Interface\\GROUPFRAME\\UI-Group-LeaderIcon")
       lead:SetPoint("TOPLEFT","SteaSummonFrame", "TOPLEFT", 60, 4)
       lead:SetSize(16,16)
@@ -1184,22 +1191,31 @@ local summon = {
     addonData.buttons[i].Button = CreateFrame("Button", "SteaSummonButton"..i, parent, "SecureActionButtonTemplate");
     addonData.buttons[i].Button:SetPoint("TOPLEFT","SteaSummonButtonFrame","TOPLEFT", wpad,-(((i-1)*bh)+hpad))
     addonData.buttons[i].Button:SetNormalFontObject("GameFontNormalSmall")
-    addonData.buttons[i].Button.tex = addonData.buttons[i].Button:CreateTexture();
-    addonData.buttons[i].Button.texHighlight = addonData.buttons[i].Button:CreateTexture()
-    addonData.buttons[i].Button.texPushed = addonData.buttons[i].Button:CreateTexture()
-    addonData.buttons[i].Button.texDisabled = addonData.buttons[i].Button:CreateTexture()
+
+    -- API compat: modern clients (WoW: Forever) removed the Set*Texture(textureObject)
+    -- overloads, so state textures are set by path and adjusted via Get*Texture()
+    local function setStateTextures(button, normal, highlight, pushed, disabled, l, r, t, b)
+      button:SetNormalTexture(normal)
+      button:SetHighlightTexture(highlight)
+      button:SetPushedTexture(pushed)
+      button:SetDisabledTexture(disabled)
+      if l then
+        button:GetNormalTexture():SetTexCoord(l, r, t, b)
+        button:GetHighlightTexture():SetTexCoord(l, r, t, b)
+        button:GetPushedTexture():SetTexCoord(l, r, t, b)
+        button:GetDisabledTexture():SetTexCoord(l, r, t, b)
+      end
+    end
 
     if i < 38 then
       addonData.buttons[i].Button:SetWidth(bw)
       addonData.buttons[i].Button:SetHeight(bh)
-      addonData.buttons[i].Button.tex:SetTexture("Interface/Buttons/UI-Panel-Button-Up")
-      addonData.buttons[i].Button.tex:SetTexCoord(0, 0.625, 0, 0.6875)
-      addonData.buttons[i].Button.texHighlight:SetTexture("Interface/Buttons/UI-Panel-Button-Highlight")
-      addonData.buttons[i].Button.texHighlight:SetTexCoord(0, 0.625, 0, 0.6875)
-      addonData.buttons[i].Button.texPushed:SetTexture("Interface/Buttons/UI-Panel-Button-Down")
-      addonData.buttons[i].Button.texPushed:SetTexCoord(0, 0.625, 0, 0.6875)
-      addonData.buttons[i].Button.texDisabled:SetTexture("Interface/Buttons/UI-Panel-Button-Disabled")
-      addonData.buttons[i].Button.texDisabled:SetTexCoord(0, 0.625, 0, 0.6875)
+      setStateTextures(addonData.buttons[i].Button,
+          "Interface/Buttons/UI-Panel-Button-Up",
+          "Interface/Buttons/UI-Panel-Button-Highlight",
+          "Interface/Buttons/UI-Panel-Button-Down",
+          "Interface/Buttons/UI-Panel-Button-Disabled",
+          0, 0.625, 0, 0.6875)
     else
       addonData.buttons[i].Button:ClearAllPoints()
       addonData.buttons[i].Button:SetWidth(bw - 30)
@@ -1209,14 +1225,12 @@ local summon = {
       addonData.buttons[i].Button.icon = addonData.buttons[i].Button:CreateTexture()
 
       if i == 38 then
-        addonData.buttons[i].Button.tex:SetTexture("Interface/Buttons/UI-QuickSlot2")
-        addonData.buttons[i].Button.tex:SetTexCoord(0.2, 0.8, 0.2, 0.8)
-        addonData.buttons[i].Button.texPushed:SetTexture("Interface/Buttons/UI-QuickSlot")
-        addonData.buttons[i].Button.texPushed:SetTexCoord(0, 1, 0, 1)
-        addonData.buttons[i].Button.texDisabled:SetTexture("Interface/Buttons/UI-QuickSlotRed")
-        addonData.buttons[i].Button.texDisabled:SetTexCoord(0, 1, 0, 1)
-        addonData.buttons[i].Button.texHighlight:SetTexture("Interface/Buttons/UI-QuickSlot-Depress")
-        addonData.buttons[i].Button.texHighlight:SetTexCoord(0, 1, 0, 1)
+        setStateTextures(addonData.buttons[i].Button,
+            "Interface/Buttons/UI-QuickSlot2",
+            "Interface/Buttons/UI-QuickSlot-Depress",
+            "Interface/Buttons/UI-QuickSlot",
+            "Interface/Buttons/UI-QuickSlotRed")
+        addonData.buttons[i].Button:GetNormalTexture():SetTexCoord(0.2, 0.8, 0.2, 0.8)
         addonData.buttons[i].Button.icon:SetTexture("Interface/ICONS/Spell_Shadow_Twilight")
         addonData.buttons[i].Button.icon:SetTexCoord(0, 1, 0, 1)
         addonData.buttons[i].Button.icon:SetAllPoints()
@@ -1263,18 +1277,6 @@ local summon = {
       end
     end
 
-    addonData.buttons[i].Button.tex:SetAllPoints()
-    addonData.buttons[i].Button:SetNormalTexture(addonData.buttons[i].Button.tex)
-
-    addonData.buttons[i].Button.texHighlight:SetAllPoints()
-    addonData.buttons[i].Button:SetHighlightTexture(addonData.buttons[i].Button.texHighlight)
-
-    addonData.buttons[i].Button.texPushed:SetAllPoints()
-    addonData.buttons[i].Button:SetPushedTexture(addonData.buttons[i].Button.texPushed)
-
-    addonData.buttons[i].Button.texDisabled:SetAllPoints()
-    addonData.buttons[i].Button:SetDisabledTexture(addonData.buttons[i].Button.texDisabled)
-
     addonData.buttons[i].Button:RegisterForClicks("LeftButtonUp")
     addonData.buttons[i].Button:SetAttribute("type", "macro");
     addonData.buttons[i].Button:SetAttribute("macrotext", "")
@@ -1308,8 +1310,8 @@ local summon = {
       addonData.buttons[i].flare:Show()
 
       --- Cancel
-      addonData.buttons[i].Cancel = CreateFrame("Button", "SteaSummonCancelButton"..i,
-          parent, "UIPanelCloseButtonNoScripts")
+      addonData.buttons[i].Cancel = CreateFrameCompat("Button", "SteaSummonCancelButton"..i,
+          parent, "UIPanelCloseButtonNoScripts", "UIPanelCloseButton")
       addonData.buttons[i].Cancel:SetWidth(bh)
       addonData.buttons[i].Cancel:SetHeight(bh)
       addonData.buttons[i].Cancel:SetText("X")

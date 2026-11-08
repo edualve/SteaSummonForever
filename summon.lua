@@ -1418,7 +1418,9 @@ local summon = {
       -- compare item IDs: on modern clients item links carry dynamic
       -- context fields, so link-to-link comparison fails, and GetItemInfo
       -- returns nil for uncached items
-      for bag = 0, NUM_BAG_SLOTS do
+      -- NUM_TOTAL_EQUIPPED_BAG_SLOTS includes the reagent bag slot that
+      -- the Forever client has (a soul bag there must count too)
+      for bag = 0, (NUM_TOTAL_EQUIPPED_BAG_SLOTS or NUM_BAG_SLOTS) do
         for slot = 1, C_Container.GetContainerNumSlots(bag) do
           if C_Container.GetContainerItemID(bag, slot) == 6265 then -- "Soul Shard"
             count = count + 1

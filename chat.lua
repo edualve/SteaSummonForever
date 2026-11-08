@@ -140,7 +140,10 @@ local chat = {
       }
       msg = tstring(msg, patterns)
       msg = "[SteaSummon] " .. msg
-      SendChatMessage(msg,channel,channel2,to)
+      -- argument 3 is the language id: classic clients tolerated a channel
+      -- name there, modern clients validate the number. nil = default
+      -- language; the target only applies to whispers
+      SendChatMessage(msg, channel, nil, channel == "WHISPER" and to or nil)
     end
   end
 }

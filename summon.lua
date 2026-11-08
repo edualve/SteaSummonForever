@@ -1562,7 +1562,10 @@ local summon = {
 
   offline = function(self, player)
     player, _ = strsplit("-", player)
-    local offline = not UnitIsConnected(player)
+    -- UnitIsConnected can be secret on the Forever client: when unknown,
+    -- treat the player as online rather than erroring
+    local connected = addonData.util:secretSafe(function() return UnitIsConnected(player) and true or false end)
+    local offline = connected == false
     local rec = self:findWaitingPlayer(player)
     if rec then
       local state = ""
@@ -1591,7 +1594,8 @@ local summon = {
   end,
 
   dead = function(self, player)
-    local dead = UnitIsDeadOrGhost(player)
+    -- UnitIsDeadOrGhost can be secret on the Forever client: assume alive
+    local dead = addonData.util:secretSafe(function() return UnitIsDeadOrGhost(player) and true or false end) or false
     local idx = self:findWaitingPlayerIdx(player)
     if idx then
       local state = ""

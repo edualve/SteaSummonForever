@@ -226,7 +226,10 @@ local gossip = {
   offlineCheck = function(self)
     local killList = {}
     for i,v in pairs(self.netList) do
-      if not UnitIsConnected(v) then
+      -- UnitIsConnected can be secret on the Forever client: only remove
+      -- players we can definitively see are offline
+      local connected = addonData.util:secretSafe(function() return UnitIsConnected(v) and true or false end)
+      if connected == false then
         table.insert(killList, 1, i)
         db("gossip", v, "is offline without notification, removing from list pos", i)
       end

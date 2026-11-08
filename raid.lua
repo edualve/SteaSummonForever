@@ -8,6 +8,10 @@ local util
 local InviteUnit = InviteUnit or (C_PartyInfo and C_PartyInfo.InviteUnit)
 local AcceptGroup = AcceptGroup or (C_PartyInfo and C_PartyInfo.AcceptInvite)
 local ConvertToRaid = ConvertToRaid or (C_PartyInfo and C_PartyInfo.ConvertToRaid)
+local PromoteToAssistant = PromoteToAssistant or (C_PartyInfo and C_PartyInfo.PromoteToAssistant)
+local DemoteAssistant = DemoteAssistant or (C_PartyInfo and C_PartyInfo.DemoteAssistant)
+local PromoteToLeader = PromoteToLeader or (C_PartyInfo and C_PartyInfo.PromoteToLeader)
+local SetLootMethod = SetLootMethod or (C_PartyInfo and C_PartyInfo.SetLootMethod)
 
 -- SetLootMethod("method" [,"masterPlayer" or threshold])
 
@@ -77,7 +81,9 @@ local raid = {
       if name == nil and not IsInRaid() then
         -- party fallback for clients where GetRaidRosterInfo is raid-only
         local unit = (i == count) and "player" or ("party" .. i)
-        name = UnitName(unit)
+        local n1, n2 = UnitName(unit)
+        -- on Forever the second value is the last name; join for the full name
+        name = (n2 and n2 ~= "") and (n1 .. " " .. n2) or n1
         rank = (UnitIsGroupLeader(unit) and 2) or 0
       end
       if SteaDEBUG and SteaDEBUG.diag then -- record raw roster name formats
@@ -283,7 +289,7 @@ local raid = {
           end
 
           db("raid", "should promote:", set)
-          if set and name ~= self.me then
+          if set and name ~= self.me and PromoteToAssistant then
             PromoteToAssistant(name)
           end
         end
@@ -331,7 +337,7 @@ local raid = {
           end
 
           db("raid", "should demote:", name, not set)
-          if not set and name ~= self.me and SteaSummonSave.finalLeadership then
+          if not set and name ~= self.me and SteaSummonSave.finalLeadership and DemoteAssistant then
             DemoteAssistant(name)
           end
         end
@@ -347,7 +353,7 @@ local raid = {
           break
         end
       end
-      if ml then
+      if ml and SetLootMethod then
         db("raid", "ML is", ml)
         SetLootMethod("master", ml)
       end
@@ -364,7 +370,7 @@ local raid = {
           break
         end
       end
-      if l then
+      if l and PromoteToLeader then
         db("raid", "raid leader is", l)
         PromoteToLeader(l)
       end

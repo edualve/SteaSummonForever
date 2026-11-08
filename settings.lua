@@ -90,6 +90,12 @@ settings = {
       SteaSummonSave.altGetOnlineWhisper = L["You are near the top of the summon queue. Get online now."]
     end
 
+    if SteaSummonSave.adText == nil then
+      SteaSummonSave.adText = L["adtext"]
+      SteaSummonSave.adCooldown = 5 -- minutes
+      SteaSummonSave.lastAdTime = 0
+    end
+
     if SteaSummonSave.warlocksAssist == nil then
       SteaSummonSave.warlocksAssist = false
       SteaSummonSave.finalLeadership = false
@@ -146,6 +152,9 @@ settings = {
     SteaSummonSave.assistPlayers = {"Stea", "Stec"}
     SteaSummonSave.raidLeaders = {"Stea", "Stec"}
     SteaSummonSave.masterLoot = {"Stea", "Ninja"}
+    SteaSummonSave.adText = L["adtext"]
+    SteaSummonSave.adCooldown = 5
+    SteaSummonSave.lastAdTime = 0
     SteaSummonSave.autoInviteTriggers = {"inv", "invite"}
     SteaSummonSave.autoInvite = 1
     SteaSummonSave.autoAccept = 1

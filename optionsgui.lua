@@ -228,6 +228,35 @@ local chat = {
         return SteaSummonSave.whisperchat
       end
     },
+    adtext = {
+      order = 30,
+      name = L["Trade advertisement text"],
+      desc = L["a sentence advertising your summons, sent to the Trade channel"],
+      type = "input",
+      width = "full",
+      set = function(_, val)
+        SteaSummonSave.adText = val
+      end,
+      get = function()
+        return SteaSummonSave.adText
+      end
+    },
+    adcooldown = {
+      order = 31,
+      type = "range",
+      name = L["Ad cooldown (minutes)"],
+      desc = L["Minimum wait between Trade ads, to keep from annoying the community"],
+      min = 1,
+      max = 30,
+      step = 1,
+      width = "double",
+      set = function(_, val)
+        SteaSummonSave.adCooldown = val
+      end,
+      get = function()
+        return SteaSummonSave.adCooldown
+      end,
+    },
     raidinfo = {
       order = 13,
       name = L["Raid summon instructions"],

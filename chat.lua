@@ -124,6 +124,53 @@ local chat = {
     self:sendChat(msg, "WHISPER", player, player)
   end,
 
+  -- find the joined Trade channel (cities only)
+  tradeChannel = function(_)
+    local args = { GetChannelList() }
+    for i = 2, #args do
+      if type(args[i]) == "string" and string.find(args[i], "^Trade") then
+        return args[i-1], args[i]
+      end
+    end
+  end,
+
+  -- is the trade ad off cooldown? returns ready, secondsRemaining
+  adReady = function(_)
+    local last = SteaSummonSave.lastAdTime or 0
+    local wait = (SteaSummonSave.adCooldown or 5) * 60
+    local remaining = wait - (time() - last)
+    if remaining > 0 then
+      return false, remaining
+    end
+    return true, 0
+  end,
+
+  -- send the configured advertisement to Trade, hard-gated by the cooldown
+  advertise = function(self)
+    local ready, remaining = self:adReady()
+    if not ready then
+      cprint(L["Next ad ready in"], string.format("%d:%02d", math.floor(remaining / 60), remaining % 60))
+      return
+    end
+
+    local msg = SteaSummonSave.adText
+    if msg == nil or msg == "" then
+      return
+    end
+
+    local chanId = self:tradeChannel()
+    if not chanId then
+      cprint(L["No Trade channel found. Trade ads only work in cities."])
+      return
+    end
+
+    local trigphrase = SteaSummonSave.summonWords[1] or ""
+    msg = tstring(msg, {["%%l"] = GetMinimapZoneText(), ["%%z"] = GetZoneText(), ["%%t"] = trigphrase})
+    SendChatMessage(msg, "CHANNEL", nil, chanId)
+    SteaSummonSave.lastAdTime = time()
+    addonData.summon:adButtonUpdate()
+  end,
+
   sendChat = function(_, msg, channel, channel2, to)
     db("chat", "sendChat ", msg, " ", channel, " ", to)
     if msg ~= nil and msg ~= "" then

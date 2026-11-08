@@ -822,6 +822,30 @@ local summon = {
         self.shards = self:shardCount()
       end
 
+      --- trade advertisement button (shows cooldown countdown while waiting)
+      if addonData.util:playerCanSummon() then
+        f.adbutton = CreateFrame("Button", "SteaSummonAdButton", SteaSummonFrame, "UIPanelButtonTemplate")
+        f.adbutton:SetSize(40, 14)
+        f.adbutton:SetPoint("TOPLEFT", "SteaSummonFrame", "TOPRIGHT", -62, -5)
+        f.adbutton:SetText(L["Ad"])
+        f.adbutton:SetNormalFontObject("GameFontNormalSmall")
+        f.adbutton:SetHighlightFontObject("GameFontHighlightSmall")
+        f.adbutton:SetDisabledFontObject("GameFontDisableSmall")
+        f.adbutton:SetFrameLevel(3)
+        f.adbutton:SetScript("OnClick", function()
+          addonData.chat:advertise()
+        end)
+        f.adbutton:SetScript("OnEnter", function(this)
+          GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
+          GameTooltip:AddLine(L["Advertise in Trade"])
+          GameTooltip:Show()
+        end)
+        f.adbutton:SetScript("OnLeave", function()
+          GameTooltip:Hide()
+        end)
+        self:adButtonUpdate()
+      end
+
       --- context menu
       f.context = CreateFrame("Button", "SteaSummonContextMenuButton",
           SteaSummonFrame, "UIPanelButtonTemplate")
@@ -1403,6 +1427,35 @@ local summon = {
       addonData.buttons[i].Status["FS"]:SetFontObject("GameFontNormalSmall")
       addonData.buttons[i].Status["FS"]:SetTextColor(1,1,1)
       addonData.buttons[i].Status["FS"]:SetText("Waiting")
+    end
+  end,
+
+  ---------------------------------
+  -- keep the Ad button's text in sync with the trade ad cooldown: shows a
+  -- ticking countdown while waiting, re-enables as "Ad" when ready
+  adButtonUpdate = function(self)
+    self = addonData.summon
+    local btn = SteaSummonAdButton
+    if not btn then
+      return
+    end
+
+    local ready, remaining = addonData.chat:adReady()
+    if ready then
+      btn:SetText(L["Ad"])
+      btn:Enable()
+      if self.adTicker then
+        self.adTicker:Cancel()
+        self.adTicker = nil
+      end
+    else
+      btn:SetText(string.format("%d:%02d", math.floor(remaining / 60), remaining % 60))
+      btn:Disable()
+      if not self.adTicker then
+        self.adTicker = C_Timer.NewTicker(1, function()
+          addonData.summon:adButtonUpdate()
+        end)
+      end
     end
   end,
 

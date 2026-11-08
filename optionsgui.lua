@@ -832,8 +832,12 @@ end
 
 function optionsgui:show()
   if optionsgui.showID and not InCombatLockdown() then
-    InterfaceOptionsFrame_Show()
-    InterfaceOptionsFrame_OpenToCategory(optionsgui.showID)
+    if Settings and Settings.OpenToCategory then -- modern clients (WoW: Forever)
+      Settings.OpenToCategory(optionsgui.showID)
+    elseif InterfaceOptionsFrame_Show then -- classic-era clients
+      InterfaceOptionsFrame_Show()
+      InterfaceOptionsFrame_OpenToCategory(optionsgui.showID)
+    end
   end
 end
 
@@ -850,7 +854,10 @@ function optionsgui:init()
   LibStub("AceConfig-3.0"):RegisterOptionsTable("SteaSummonAlts", alts, "ss-alts")
   LibStub("AceConfig-3.0"):RegisterOptionsTable("SteaSummonRaid", raid, "ss-raid")
   LibStub("AceConfig-3.0"):RegisterOptionsTable("SteaSummonAdv", advanced)
-  LibStub("AceConfigDialog-3.0"):AddToBlizOptions(name)
+  -- on modern clients AddToBlizOptions returns the Settings category ID,
+  -- which Settings.OpenToCategory needs; fall back to the name for classic
+  local _, categoryID = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(name)
+  optionsgui.showID = categoryID or name
   LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SteaSummonDisplay", L["Display"], name)
   LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SteaSummonMessages", L["Messages"], name)
   LibStub("AceConfigDialog-3.0"):AddToBlizOptions("SteaSummonWords", L["Triggers"], name)

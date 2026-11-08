@@ -21,7 +21,11 @@ local chat = {
     if event == "CHAT_MSG_SAY" and player ~= me then
       return
     end
-    if servername ~= GetRealmName() then
+    -- modern clients send authors as Name-Realm even on the home realm;
+    -- keep the full name only for genuinely foreign realms so comparisons
+    -- against UnitName("player") and roster names still match
+    local _, myrealm = UnitFullName("player")
+    if server and server ~= "" and server ~= myrealm then
         player = servername
     end
 
@@ -84,7 +88,10 @@ local chat = {
         name, server = strsplit("-", servername)
         db("chat","adding ", name, "to summon list")
 
-        if IsInGroup(player) or (player == me and settings:debug()) then
+        -- IsInGroup takes a category constant, not a player: classic clients
+        -- ignored the bad argument (truthy), modern clients return false.
+        -- What we actually want: is the requester in my group?
+        if UnitInParty(player) or UnitInRaid(player) or (player == me and settings:debug()) then
           gossip:add(player, event == "CHAT_MSG_WHISPER" )
         end
       elseif event == "CHAT_MSG_WHISPER" then

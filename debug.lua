@@ -22,19 +22,30 @@ local aboveLogLevel = 1000001
 -- without needing an error-display addon or scriptErrors enabled
 local errorBuffer = {}
 local function trapError(msg)
-  local entry = {
-    time = date("%Y-%m-%d %H:%M:%S"),
-    error = tostring(msg),
-    stack = debugstack(4),
-  }
+  msg = tostring(msg)
+  local store
   if SteaDEBUG then
     SteaDEBUG.errors = SteaDEBUG.errors or {}
-    table.insert(SteaDEBUG.errors, entry)
-    while #SteaDEBUG.errors > 20 do
-      table.remove(SteaDEBUG.errors, 1)
-    end
+    store = SteaDEBUG.errors
   else -- before saved variables load; flushed in debug:init
-    table.insert(errorBuffer, entry)
+    store = errorBuffer
+  end
+  -- dedupe repeats so a recurring error cannot flood out the first cause
+  for _, e in ipairs(store) do
+    if e.error == msg then
+      e.count = (e.count or 1) + 1
+      e.last = date("%Y-%m-%d %H:%M:%S")
+      return
+    end
+  end
+  table.insert(store, {
+    time = date("%Y-%m-%d %H:%M:%S"),
+    error = msg,
+    stack = debugstack(4),
+    count = 1,
+  })
+  while #store > 20 do
+    table.remove(store, 1)
   end
 end
 local origErrorHandler = geterrorhandler()
@@ -66,8 +77,10 @@ local debug = {
       SteaDEBUG.loglength = 3000
     end
 
-    -- flush errors trapped before saved variables were available
-    SteaDEBUG.errors = SteaDEBUG.errors or {}
+    -- start this session's error list fresh (the previous session's errors
+    -- were already written to disk when it ended), then flush any errors
+    -- trapped before saved variables were available
+    SteaDEBUG.errors = {}
     for _, e in ipairs(errorBuffer) do
       table.insert(SteaDEBUG.errors, e)
     end

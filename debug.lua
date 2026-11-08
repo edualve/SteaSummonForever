@@ -17,6 +17,34 @@
 local addonName, addonData = ...
 local aboveLogLevel = 1000001
 
+-- error trap: capture Lua errors (message + stack) into the SteaDEBUG saved
+-- variable so they can be read from the SavedVariables file after a /reload,
+-- without needing an error-display addon or scriptErrors enabled
+local errorBuffer = {}
+local function trapError(msg)
+  local entry = {
+    time = date("%Y-%m-%d %H:%M:%S"),
+    error = tostring(msg),
+    stack = debugstack(4),
+  }
+  if SteaDEBUG then
+    SteaDEBUG.errors = SteaDEBUG.errors or {}
+    table.insert(SteaDEBUG.errors, entry)
+    while #SteaDEBUG.errors > 20 do
+      table.remove(SteaDEBUG.errors, 1)
+    end
+  else -- before saved variables load; flushed in debug:init
+    table.insert(errorBuffer, entry)
+  end
+end
+local origErrorHandler = geterrorhandler()
+seterrorhandler(function(msg)
+  pcall(trapError, msg)
+  if origErrorHandler then
+    return origErrorHandler(msg)
+  end
+end)
+
 -- local
 local debug = {
   loglevel = aboveLogLevel, -- our logging level, set just above default log print level
@@ -37,6 +65,13 @@ local debug = {
     if SteaDEBUG.loglength == nil then
       SteaDEBUG.loglength = 3000
     end
+
+    -- flush errors trapped before saved variables were available
+    SteaDEBUG.errors = SteaDEBUG.errors or {}
+    for _, e in ipairs(errorBuffer) do
+      table.insert(SteaDEBUG.errors, e)
+    end
+    errorBuffer = {}
 
     if #SteaDEBUG.log > SteaDEBUG.loglength then
       for i = #SteaDEBUG.log, SteaDEBUG.loglength, -1 do

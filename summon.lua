@@ -1284,7 +1284,10 @@ local summon = {
       end
     end
 
-    addonData.buttons[i].Button:RegisterForClicks("LeftButtonUp")
+    -- modern clients cast on key down by default: a secure button registered
+    -- only for up-clicks never triggers its action, so register both; the
+    -- secure handler runs the action once, on the phase the client expects
+    addonData.buttons[i].Button:RegisterForClicks("LeftButtonDown", "LeftButtonUp")
     addonData.buttons[i].Button:SetAttribute("type", "macro");
     addonData.buttons[i].Button:SetAttribute("macrotext", "")
 

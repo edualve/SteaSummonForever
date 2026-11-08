@@ -133,9 +133,17 @@ local chat = {
         trigphrase = ""
       end
 
+      local l = GetMinimapZoneText()
+      local z = GetZoneText()
+      if l == z then
+        -- "Thunder Bluff in Thunder Bluff" reads badly: collapse the
+        -- location phrase when subzone and zone are the same
+        msg = string.gsub(msg, "%%l in %%z", "%%z")
+      end
+
       local patterns = {["%%p"] = to,
-                        ["%%l"] = GetMinimapZoneText(),
-                        ["%%z"] = GetZoneText(),
+                        ["%%l"] = l,
+                        ["%%z"] = z,
                         ["%%t"] = trigphrase
       }
       msg = tstring(msg, patterns)

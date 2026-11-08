@@ -11,6 +11,13 @@ local GetSpellInfo = GetSpellInfo or function(spellID)
 end
 local GetItemInfo = GetItemInfo or (C_Item and C_Item.GetItemInfo)
 
+-- mana can be a secret value on the Forever client that addon code may not
+-- compare; when unknown, assume there is enough to summon (no auto life tap)
+local function hasSummonMana()
+  local ok, result = pcall(function() return UnitPower("player") >= 300 end)
+  return (not ok) or result
+end
+
 -- API compat: create a frame, falling back to another (or no) template when the
 -- client no longer ships the classic-era one
 local function CreateFrameCompat(frameType, name, parent, template, fallbackTemplate)
@@ -946,7 +953,7 @@ local summon = {
             summonClick = function(_, button)
               if button == nil or button == "LeftButton" then
                 if not addonData.summon.isCasting then
-                  if UnitPower("player") >= 300 then
+                  if hasSummonMana() then
                     db("summon.display","summoning ", player)
                     addonData.gossip:status(player, "pending")
                     addonData.chat:raid(SteaSummonSave.raidchat, player)
@@ -1158,7 +1165,7 @@ local summon = {
   SetMacro = function(self, index, player)
     if (addonData.util:playerCanSummon()) then
       if not self.isCasting then
-        if UnitPower("player") >= 300 then
+        if hasSummonMana() then
           --self.isCasting = true
           local spell = GetSpellInfo(698) -- Ritual of Summoning
           name, server = strsplit("-", player)

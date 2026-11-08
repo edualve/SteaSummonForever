@@ -807,7 +807,7 @@ local summon = {
         f.shards:SetSize(12,12)
 
         f.shards.count = f.shards:CreateFontString(nil,"ARTWORK", nil, 7)
-        f.shards.count:SetFont("Fonts\\ARIALN.ttf", 12, "BOLD")
+        f.shards.count:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE") -- "BOLD" is not a valid flag; modern clients reject it
         f.shards.count:SetPoint("CENTER","SteaSummonShardIcon", "CENTER", 5, -5)
         f.shards.count:SetText("0")
         f.shards.count:SetTextColor(1,1,1,1)

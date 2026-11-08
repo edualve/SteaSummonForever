@@ -117,7 +117,7 @@ local raid = {
     wipe(self.clickers)
 
     for k, _ in pairs(self.roster) do
-      if UnitInRange(k) then
+      if addonData.util:unitNearby(k) then
         table.insert(self.clickers, k)
       end
     end

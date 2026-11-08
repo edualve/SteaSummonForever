@@ -141,6 +141,26 @@ local util = {
     return inTable
   end,
 
+  -- API compat: on the WoW: Forever client some unit APIs (UnitInRange,
+  -- UnitIsVisible, UnitPosition) can return secret values that addon code
+  -- may not branch on; evaluating inside pcall turns that into a nil result
+  secretSafe = function(_, fn)
+    local ok, result = pcall(fn)
+    if ok then
+      return result
+    end
+    return nil -- value was secret (or errored): caller falls back
+  end,
+
+  unitNearby = function(self, unit)
+    local r = self:secretSafe(function() return UnitInRange(unit) and true or false end)
+    if r ~= nil then return r end
+    -- range is secret: approximate with visibility (~100yd, same phase)
+    r = self:secretSafe(function() return UnitIsVisible(unit) and true or false end)
+    if r ~= nil then return r end
+    return self:isNear(unit)
+  end,
+
   playerClose = function(self, player)
     local me, _ = UnitName("player")
     player = strsplit("-", player) -- might turn up as player-server
@@ -149,7 +169,7 @@ local util = {
       return false -- don't trip for yourself, we'll let others tell us you're summoned :)
     end
 
-    if UnitInRange(player) or self:isNear(player) then
+    if self:unitNearby(player) or self:isNear(player) then
       return true
     end
   end,
@@ -172,15 +192,21 @@ local util = {
   end,
 
   distance = function(_, unit1, unit2)
-    local out
-    local y1, x1, _, instance1 = UnitPosition(unit1)
-    local y2, x2, _, instance2 = UnitPosition(unit2)
-    if y1 and x1 and x2 and y2 then
-      if instance1 == instance2 then
-        out = ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5
+    -- positions can be secret on the Forever client; pcall turns the
+    -- forbidden branch into a nil distance (unknown)
+    local ok, out = pcall(function()
+      local y1, x1, _, instance1 = UnitPosition(unit1)
+      local y2, x2, _, instance2 = UnitPosition(unit2)
+      if y1 and x1 and x2 and y2 then
+        if instance1 == instance2 then
+          return ((x2 - x1) ^ 2 + (y2 - y1) ^ 2) ^ 0.5
+        end
       end
+    end)
+    if ok then
+      return out
     end
-    return out
+    return nil
   end,
 
   isNear = function(self, player)

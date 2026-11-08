@@ -1415,10 +1415,12 @@ local summon = {
   shardCount = function(_)
     local count = 0
     if SteaSummonShardIcon then
-      local _, itemLink = GetItemInfo(6265) -- "Soul Shard"
+      -- compare item IDs: on modern clients item links carry dynamic
+      -- context fields, so link-to-link comparison fails, and GetItemInfo
+      -- returns nil for uncached items
       for bag = 0, NUM_BAG_SLOTS do
         for slot = 1, C_Container.GetContainerNumSlots(bag) do
-          if(C_Container.GetContainerItemLink(bag, slot) == itemLink) then
+          if C_Container.GetContainerItemID(bag, slot) == 6265 then -- "Soul Shard"
             count = count + 1
           end
         end

@@ -1,0 +1,11 @@
+package-as: SteaSummonForever
+
+ignore:
+  - README.md
+  - CHANGELOG.md
+  - img
+  - dist
+  - .pkgmeta
+  - .github
+
+enable-toc-creation: no

@@ -1,9 +1,12 @@
 ## Interface: 16001
 ## Title: SteaSummonForever
-## Notes: One button summoning, shared summoning list...
+## Notes: One button warlock summoning with a shared, prioritized summon list for your whole raid.
 ## Author: Edualve
-## Version: 1.00
+## Version: 1.0.0
+## IconTexture: Interface/ICONS/Spell_Shadow_Twilight
 ## SavedVariablesPerCharacter: SteaSummonSave, SteaDEBUG, SteaSummonSaveLDB
+## X-Category: Chat & Communication
+## X-Website: https://github.com/edualve/SteaSummonForever
 ## x-SteaSummon-Protocol-version: 0.64
 
 Libs\embeds.xml

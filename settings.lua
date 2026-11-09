@@ -40,6 +40,11 @@ settings = {
 
     -- init settings that have been added since release
 
+    -- older versions could accidentally store a table here
+    if type(SteaSummonSave.debug) ~= "boolean" then
+      SteaSummonSave.debug = nil
+    end
+
     if SteaSummonSave.shitlist == nil then
       SteaSummonSave.shitlist = {}
     end
@@ -196,11 +201,15 @@ settings = {
     return nil
   end,
 
-  debug = function(bug)
+  -- NOTE: callers use colon syntax, so the first argument is the module
+  debug = function(_, bug)
     if bug ~= nil then
       SteaSummonSave.debug = bug
+      if bug then
+        addonData.debug:installErrorTrap() -- start capturing errors at once
+      end
     end
-    return SteaSummonSave.debug
+    return SteaSummonSave.debug and true or false
   end,
 
   showWindow = function()

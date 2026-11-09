@@ -48,13 +48,22 @@ local function trapError(msg)
     table.remove(store, 1)
   end
 end
-local origErrorHandler = geterrorhandler()
-seterrorhandler(function(msg)
-  pcall(trapError, msg)
-  if origErrorHandler then
-    return origErrorHandler(msg)
+-- the trap hooks the global error handler, so it is only installed when the
+-- addon's debug mode is on (!SS debug in /say, or /reload with it saved on)
+local trapInstalled = false
+local function installErrorTrap()
+  if trapInstalled then
+    return
   end
-end)
+  trapInstalled = true
+  local origErrorHandler = geterrorhandler()
+  seterrorhandler(function(msg)
+    pcall(trapError, msg)
+    if origErrorHandler then
+      return origErrorHandler(msg)
+    end
+  end)
+end
 
 -- local
 local debug = {
@@ -69,6 +78,10 @@ local debug = {
   categoryLog = {},
   categoryChildren = {},
 
+  installErrorTrap = function(_)
+    installErrorTrap()
+  end,
+
   init = function(self)
     if not SteaDEBUG or not SteaDEBUG.log then
       self:reset()
@@ -77,14 +90,11 @@ local debug = {
       SteaDEBUG.loglength = 3000
     end
 
-    -- diagnostic snapshot of name formats (Forever uses first/last names)
-    SteaDEBUG.diag = {
-      unitName = { UnitName("player") },
-      unitFullName = { UnitFullName("player") },
-      realmName = GetRealmName(),
-      roster = {},
-      authors = {},
-    }
+    SteaDEBUG.diag = nil -- remove diagnostics left by development versions
+
+    if SteaSummonSave and SteaSummonSave.debug then
+      installErrorTrap()
+    end
 
     -- start this session's error list fresh (the previous session's errors
     -- were already written to disk when it ended), then flush any errors

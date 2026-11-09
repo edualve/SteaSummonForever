@@ -16,10 +16,6 @@ local chat = {
   callback = function (_, event, msg, servername, ...)
     local me = addonData.util:playerFullName()
 
-    if SteaDEBUG and SteaDEBUG.diag then -- record raw chat author formats
-      SteaDEBUG.diag.authors[event] = servername
-    end
-
     -- don't want randos adding themselves
     local player, server = strsplit("-", servername)
     if event == "CHAT_MSG_SAY" and player ~= me then

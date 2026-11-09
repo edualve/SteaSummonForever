@@ -70,7 +70,10 @@ local gossip = {
     self.me = addonData.util:playerFullName()
     self.votes = UnitGUID("player")
     self.version = GetAddOnMetadata(addonName, "x-SteaSummon-Protocol-version")
-    self.SSversion = tonumber(GetAddOnMetadata(addonName, "Version"))
+    -- "1.0.0" style versions are not plain numbers: build a comparable
+    -- value from the parts (1.0.0 -> 10000, 1.2.3 -> 10203)
+    local major, minor, patch = string.match(GetAddOnMetadata(addonName, "Version") or "", "(%d+)%.?(%d*)%.?(%d*)")
+    self.SSversion = (tonumber(major) or 0) * 10000 + (tonumber(minor) or 0) * 100 + (tonumber(patch) or 0)
   end,
 
   ---------------------------------
@@ -1088,6 +1091,9 @@ local gossip = {
       db("gossip", "<< version <<", sender)
       local reported_version = tonumber(subcmd)
       db("gossip", "my version:", self.SSversion, sender, "version:", reported_version)
+      if reported_version == nil or self.SSversion == nil then
+        return -- a client sent a version this one cannot compare
+      end
       if reported_version < self.SSversion then
         self:SteaSummonVersion(sender)
       end

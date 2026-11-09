@@ -940,7 +940,7 @@ local summon = {
             addonData.buttons[i].Status["FS"]:SetTextColor(0.5,1,0.5, 1)
           end
           addonData.buttons[i].Button:SetAttribute("macrotext", "")
-          addonData.buttons[i].Button:SetScript("OnMouseUp", nil)
+          addonData.buttons[i].Button:SetScript("OnMouseDown", nil)
         elseif self:listDirty() then
           local _, class = UnitClass(player)
           r,g,b,_ = GetClassColor(class)
@@ -992,7 +992,7 @@ local summon = {
                 end
               end
             end
-            addonData.buttons[i].Button:SetScript("OnMouseUp", summonClick)
+            addonData.buttons[i].Button:SetScript("OnMouseDown", summonClick)
           end
         end
       else
@@ -1024,7 +1024,7 @@ local summon = {
               next = true
               self.nextIdx = i
               self:SetMacro(38, player)
-              addonData.buttons[38].Button:SetScript("OnMouseUp", summonClick)
+              addonData.buttons[38].Button:SetScript("OnMouseDown", summonClick)
               addonData.buttons[38].Button:Show()
             end
             listActive = true

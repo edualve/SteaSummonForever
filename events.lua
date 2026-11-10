@@ -103,6 +103,9 @@ local function start()
   call["UNIT_SPELLCAST_CHANNEL_STOP"] = addonData.summon.castWatch
   call["UNIT_SPELLCAST_SUCCEEDED"] = addonData.summon.castWatch
   call["ITEM_PUSH"] = addonData.summon.bagPushShardCheck
+  call["ZONE_CHANGED"] = addonData.summon.zoneChanged
+  call["ZONE_CHANGED_NEW_AREA"] = addonData.summon.zoneChanged
+  call["ZONE_CHANGED_INDOORS"] = addonData.summon.zoneChanged
   call["PARTY_INVITE_REQUEST"] = addonData.raid.acceptInvites
 
   -- under observation

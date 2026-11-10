@@ -560,6 +560,25 @@ local summon = {
   end,
 
   ---------------------------------
+  -- arrival self-report: range APIs are secret on the Forever client, but
+  -- zone text is not, so each addon user detects reaching the destination
+  -- themselves and tells everyone
+  reportSelfArrival = function(self)
+    self = addonData.summon
+    if self.zone ~= "" and self:findWaitingPlayer(self.me) and self:isAtDestination() then
+      db("summon.waitlist", "arrived at destination, reporting self")
+      addonData.gossip:arrived(self.me, false)
+    end
+  end,
+
+  ---------------------------------
+  zoneChanged = function()
+    local self = addonData.summon
+    self:setCurrentLocation()
+    self:reportSelfArrival()
+  end,
+
+  ---------------------------------
   tick = function(self)
     --- detect arriving players
     local players = {}
@@ -585,6 +604,7 @@ local summon = {
 
     --- update our location
     self:setCurrentLocation()
+    self:reportSelfArrival()
   end,
 
   ---------------------------------
@@ -987,6 +1007,9 @@ local summon = {
                   local summonStatus = C_IncomingSummon.IncomingSummonStatus(player)
                   if summonStatus == 2 then
                     self:recStatus(self.waiting[i], "accepted")
+                    -- accepting a summon teleports the player to the
+                    -- destination: that is an arrival, remove them
+                    addonData.gossip:arrived(player, false)
                   elseif summonStatus == 3 then
                     self:recStatus(self.waiting[i], "declined")
                   end

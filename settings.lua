@@ -101,6 +101,10 @@ settings = {
       SteaSummonSave.lastAdTime = 0
     end
 
+    if SteaSummonSave.afkText == nil then
+      SteaSummonSave.afkText = L["afktext"]
+    end
+
     if SteaSummonSave.warlocksAssist == nil then
       SteaSummonSave.warlocksAssist = false
       SteaSummonSave.finalLeadership = false
@@ -160,6 +164,7 @@ settings = {
     SteaSummonSave.adText = L["adtext"]
     SteaSummonSave.adCooldown = 5
     SteaSummonSave.lastAdTime = 0
+    SteaSummonSave.afkText = L["afktext"]
     SteaSummonSave.autoInviteTriggers = {"inv", "invite"}
     SteaSummonSave.autoInvite = 1
     SteaSummonSave.autoAccept = 1

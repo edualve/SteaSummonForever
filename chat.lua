@@ -94,9 +94,16 @@ local chat = {
         if UnitInParty(player) or UnitInRaid(player) or (player == me and settings:debug()) then
           gossip:add(player, event == "CHAT_MSG_WHISPER" )
         end
+        if event == "CHAT_MSG_WHISPER" then
+          addonData.chat:afkReply(player) -- no-op unless AFK
+        end
       elseif event == "CHAT_MSG_WHISPER" then
         if raid:isInvTrigger(msg) then
-          raid:whisperedTrigger(player)
+          if addonData.summon.afk then
+            addonData.chat:afkReply(player) -- AFK: reply instead of inviting
+          else
+            raid:whisperedTrigger(player)
+          end
         else
           addonData.alt:whispered(player, msg)
         end
@@ -118,6 +125,19 @@ local chat = {
 
   whisper = function(self, msg, player)
     self:sendChat(msg, "WHISPER", player, player)
+  end,
+
+  -- whisper the AFK message back, once per player per AFK session
+  afkReply = function(self, player)
+    local summon = addonData.summon
+    if not summon.afk then
+      return
+    end
+    if summon.afkReplied[player] then
+      return
+    end
+    summon.afkReplied[player] = true
+    self:whisper(SteaSummonSave.afkText, player)
   end,
 
   -- find the joined Trade channel (cities only)

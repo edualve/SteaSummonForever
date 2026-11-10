@@ -29,6 +29,8 @@ end
 local summon = {
   waiting = {}, -- the summon list
   numwaiting = 0, -- the summon list length
+  afk = false, -- while AFK: auto invites pause, asks get an AFK whisper
+  afkReplied = {}, -- players already given the AFK reply this session
   hasSummoned = false, -- when true we believe you more
   tainted = false, -- indicates player has cancelled something that's nothing to do with them
   myLocation = "", -- the location player is
@@ -822,6 +824,28 @@ local summon = {
         self.shards = self:shardCount()
       end
 
+      --- AFK toggle button
+      if addonData.util:playerCanSummon() then
+        f.afkbutton = CreateFrame("Button", "SteaSummonAfkButton", SteaSummonFrame, "UIPanelButtonTemplate")
+        f.afkbutton:SetSize(40, 14)
+        f.afkbutton:SetPoint("TOPLEFT", "SteaSummonFrame", "TOPRIGHT", -106, -5)
+        f.afkbutton:SetText(L["AFK"])
+        f.afkbutton:SetNormalFontObject("GameFontNormalSmall")
+        f.afkbutton:SetHighlightFontObject("GameFontHighlightSmall")
+        f.afkbutton:SetFrameLevel(3)
+        f.afkbutton:SetScript("OnClick", function()
+          addonData.summon:afkToggle()
+        end)
+        f.afkbutton:SetScript("OnEnter", function(this)
+          GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
+          GameTooltip:AddLine(L["Toggle AFK: pauses auto invites and replies to asks"])
+          GameTooltip:Show()
+        end)
+        f.afkbutton:SetScript("OnLeave", function()
+          GameTooltip:Hide()
+        end)
+      end
+
       --- trade advertisement button (shows cooldown countdown while waiting)
       if addonData.util:playerCanSummon() then
         f.adbutton = CreateFrame("Button", "SteaSummonAdButton", SteaSummonFrame, "UIPanelButtonTemplate")
@@ -1427,6 +1451,27 @@ local summon = {
       addonData.buttons[i].Status["FS"]:SetFontObject("GameFontNormalSmall")
       addonData.buttons[i].Status["FS"]:SetTextColor(1,1,1)
       addonData.buttons[i].Status["FS"]:SetText("Waiting")
+    end
+  end,
+
+  ---------------------------------
+  -- toggle AFK: pause auto invites, whisper the AFK reply to asks, and
+  -- tint the button red while on
+  afkToggle = function(self)
+    self = addonData.summon
+    self.afk = not self.afk
+    wipe(self.afkReplied) -- each AFK session replies to each player once
+    local btn = SteaSummonAfkButton
+    if self.afk then
+      if btn then
+        btn:SetNormalFontObject("GameFontRedSmall")
+      end
+      cprint(L["You are now AFK: auto invites are paused and asks get an AFK reply"])
+    else
+      if btn then
+        btn:SetNormalFontObject("GameFontNormalSmall")
+      end
+      cprint(L["You are no longer AFK"])
     end
   end,
 

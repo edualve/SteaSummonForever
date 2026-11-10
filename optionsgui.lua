@@ -241,6 +241,19 @@ local chat = {
         return SteaSummonSave.adText
       end
     },
+    afktext = {
+      order = 32,
+      name = L["AFK reply text"],
+      desc = L["a sentence whispered back when someone asks for an invite or summon while you are AFK"],
+      type = "input",
+      width = "full",
+      set = function(_, val)
+        SteaSummonSave.afkText = val
+      end,
+      get = function()
+        return SteaSummonSave.afkText
+      end
+    },
     adcooldown = {
       order = 31,
       type = "range",

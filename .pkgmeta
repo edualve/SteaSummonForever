@@ -1,8 +1,9 @@
 package-as: SteaSummonForever
 
+manual-changelog: CHANGELOG.md
+
 ignore:
   - README.md
-  - CHANGELOG.md
   - img
   - dist
   - .pkgmeta

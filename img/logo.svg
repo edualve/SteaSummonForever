@@ -1,0 +1,45 @@
+<svg width="480" height="480" viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SteaSummonForever logo: twilight sky with a glowing infinity summoning portal above dark mountains">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0B0420"/>
+      <stop offset="0.55" stop-color="#2A1050"/>
+      <stop offset="1" stop-color="#4A2178"/>
+    </linearGradient>
+    <linearGradient id="portal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#C084FC"/>
+      <stop offset="0.5" stop-color="#E879F9"/>
+      <stop offset="1" stop-color="#8B5CF6"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+  <rect width="480" height="480" fill="url(#sky)"/>
+  <g fill="#FFFFFF">
+    <circle cx="60" cy="70" r="2.5" opacity="0.9"/>
+    <circle cx="130" cy="40" r="1.8" opacity="0.7"/>
+    <circle cx="210" cy="86" r="1.5" opacity="0.6"/>
+    <circle cx="300" cy="50" r="2.2" opacity="0.85"/>
+    <circle cx="390" cy="80" r="1.6" opacity="0.65"/>
+    <circle cx="430" cy="150" r="2.4" opacity="0.8"/>
+    <circle cx="40" cy="180" r="1.5" opacity="0.6"/>
+    <circle cx="360" cy="140" r="1.4" opacity="0.55"/>
+    <circle cx="100" cy="130" r="1.9" opacity="0.7"/>
+    <circle cx="250" cy="30" r="1.4" opacity="0.5"/>
+    <circle cx="455" cy="40" r="1.7" opacity="0.7"/>
+    <circle cx="25" cy="110" r="1.4" opacity="0.55"/>
+  </g>
+  <g transform="translate(0, -14)">
+    <path d="M 118 238 C 118 184 186 184 240 238 C 294 292 362 292 362 238 C 362 184 294 184 240 238 C 186 292 118 292 118 238 Z"
+          fill="none" stroke="#A855F7" stroke-width="30" stroke-linecap="round" opacity="0.55" filter="url(#glow)"/>
+    <path d="M 118 238 C 118 184 186 184 240 238 C 294 292 362 292 362 238 C 362 184 294 184 240 238 C 186 292 118 292 118 238 Z"
+          fill="none" stroke="url(#portal)" stroke-width="18" stroke-linecap="round"/>
+    <path d="M 240 222 L 245 234 L 257 238 L 245 242 L 240 254 L 235 242 L 223 238 L 235 234 Z" fill="#FFFFFF" opacity="0.95"/>
+  </g>
+  <path d="M 0 360 L 55 300 L 110 352 L 168 286 L 226 350 L 282 304 L 340 356 L 398 298 L 480 364 L 480 480 L 0 480 Z" fill="#130A26"/>
+  <path d="M 0 400 L 70 348 L 140 398 L 215 340 L 290 400 L 352 352 L 420 402 L 480 360 L 480 480 L 0 480 Z" fill="#0A0516"/>
+  <g fill="#0A0516">
+    <path d="M 84 418 L 96 382 L 108 418 Z"/>
+    <path d="M 372 428 L 386 388 L 400 428 Z"/>
+  </g>
+</svg>

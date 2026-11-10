@@ -1,3 +1,5 @@
+<p align="center"><img src="./img/logo-256.png" alt="SteaSummonForever logo" width="200"/></p>
+
 # SteaSummonForever
 
 ***FAN UPDATE FOR WORLD OF WARCRAFT: FOREVER***

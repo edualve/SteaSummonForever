@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 (2026-11-13)
+
+- Fix a leftover debug print that spammed the next queued player's
+  name to the chat log once per second while channeling a summon.
+
 ## 1.0.0 (2026-11-08)
 
 First release for World of Warcraft: Forever, ported from

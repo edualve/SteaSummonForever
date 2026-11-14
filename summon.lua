@@ -1078,7 +1078,6 @@ local summon = {
           elseif next and self.isCasting then
             addonData.buttons[38].Button:Show()
             local nextplayer = self:recPlayer(self.waiting[self.nextIdx])
-            print(nextplayer)
             self:SetMacro(38, nextplayer)
           end
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2 (2026-11-15)
+
+- Fix summon requests being silently dropped from the list when the
+  requester had a recent summon from any source (meeting stone, a
+  warlock without the addon, or a re-request after an addon summon):
+  the game keeps reporting that summon as accepted for a while, which
+  the arrival cleanup mistook for a fresh arrival.
+
 ## 1.0.1 (2026-11-13)
 
 - Fix a leftover debug print that spammed the next queued player's

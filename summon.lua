@@ -31,6 +31,7 @@ local summon = {
   numwaiting = 0, -- the summon list length
   afk = false, -- while AFK: auto invites pause, asks get an AFK whisper
   afkReplied = {}, -- players already given the AFK reply this session
+  incomingIgnore = {}, -- players whose C_IncomingSummon state was stale at add time
   hasSummoned = false, -- when true we believe you more
   tainted = false, -- indicates player has cancelled something that's nothing to do with them
   myLocation = "", -- the location player is
@@ -446,7 +447,8 @@ local summon = {
         player = name
     end
     
-    if not IsInGroup(player) then
+    -- IsInGroup takes a category constant, not a player name
+    if not IsInGroup(LE_PARTY_CATEGORY_HOME) then
       return nil
     end
 
@@ -462,6 +464,14 @@ local summon = {
         return nil
       end
     end
+    -- a recently finished summon leaves C_IncomingSummon reporting
+    -- accepted/declined for a couple of minutes; remember that stale state
+    -- so the tick loop doesn't instantly remove a re-requesting player
+    if C_IncomingSummon and C_IncomingSummon.IncomingSummonStatus then
+      local ok, st = pcall(C_IncomingSummon.IncomingSummonStatus, player)
+      self.incomingIgnore[player] = (ok and (st == 2 or st == 3)) or nil
+    end
+
     db("summon.waitlist", "Making some space for ", player)
 
     -- priorities
@@ -997,7 +1007,14 @@ local summon = {
           -- and used in the classic UI code download...
           -- I may have misread the error during raid, just adding extra caution detects
           if player and C_IncomingSummon and C_IncomingSummon.HasIncomingSummon then -- paranoia
-            if C_IncomingSummon.HasIncomingSummon(player) then
+            if self.incomingIgnore[player] then
+              -- stale accepted/declined from a previous summon: ignore it
+              -- until the client reports a fresh state (none or pending)
+              local ok, st = pcall(C_IncomingSummon.IncomingSummonStatus, player)
+              if ok and st ~= 2 and st ~= 3 then
+                self.incomingIgnore[player] = nil
+              end
+            elseif C_IncomingSummon.HasIncomingSummon(player) then
               local status = self:recStatus(self.waiting[i])
               if status ~= "summoned" and status ~= "accepted" and status ~= "declined" then
                 self:recStatus(self.waiting[i], "summoned")

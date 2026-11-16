@@ -1072,14 +1072,18 @@ local summon = {
         });
 
         --- Cancel Button
-        cancelClick = function(_, button, worked)
-          if button == "LeftButton" and worked then
+        -- OnClick, not OnMouseUp: the old handler waited on a third
+        -- argument OnMouseUp never passes, so the x did nothing; this
+        -- also overrides the fallback close-button template's default
+        -- OnClick on modern clients
+        cancelClick = function(_, button)
+          if button == "LeftButton" then
             addonData.gossip:arrived(player, true)
             db("summon.display","cancelling", player)
           end
         end
 
-        addonData.buttons[i].Cancel:SetScript("OnMouseUp", cancelClick)
+        addonData.buttons[i].Cancel:SetScript("OnClick", cancelClick)
 
         if self.waiting[i]  then
           --- Next Button

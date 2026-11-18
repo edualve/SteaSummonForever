@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3 (2026-11-18)
+
+- Fix the x button on summon list rows doing nothing: its click
+  handler was waiting on an argument the mouse event never passes.
+
 ## 1.0.2 (2026-11-15)
 
 - Fix summon requests being silently dropped from the list when the
